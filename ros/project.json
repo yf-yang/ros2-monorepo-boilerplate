@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "ros_ws",
+  "projectType": "application",
+  "root": "ros",
+  "sourceRoot": "ros/src",
+  "targets": {
+    "build-dev": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/ros/build",
+        "{workspaceRoot}/ros/install",
+        "{workspaceRoot}/ros/log"
+      ],
+      "options": {
+        "cwd": "ros",
+        "command": "colcon build --symlink-install --event-handlers console_direct+ log+ --cmake-args -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+      }
+    },
+    "build-ci": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/ros/build",
+        "{workspaceRoot}/ros/install",
+        "{workspaceRoot}/ros/log"
+      ],
+      "options": {
+        "cwd": "ros",
+        "command": "colcon build --symlink-install --event-handlers console_cohesion+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-dev"],
+      "inputs": [
+        "{projectRoot}/src/**/*.cpp",
+        "{projectRoot}/src/**/*.hpp",
+        "{projectRoot}/src/**/*.h"
+      ],
+      "options": {
+        "cwd": "ros",
+        "command": "python3 -c \"import json,glob;e=[x for f in glob.glob('build/*/compile_commands.json') for x in json.load(open(f))];json.dump(e,open('build/compile_commands.json','w'))\" && find src -type f -name '*.cpp' | xargs -r clang-tidy -p build --warnings-as-errors=*"
+      }
+    },
+    "run-demo": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-dev"],
+      "options": {
+        "command": "bash -lc 'source ros/install/setup.bash && ros2 launch demo_bringup demo_nodes.launch.py'"
+      }
+    }
+  }
+}

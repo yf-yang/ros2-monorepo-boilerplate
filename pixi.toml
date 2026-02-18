@@ -1,0 +1,112 @@
+[workspace]
+name = "ros2-workspace-template"
+version = "0.1.0"
+channels = ["https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/"]
+platforms = ["linux-aarch64"]
+
+[pypi-options]
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[environments]
+default = ["jazzy"]
+
+[feature.jazzy]
+channels = ["robostack-jazzy"]
+
+[feature.jazzy.activation]
+scripts = ["scripts/ros_activate.sh"]
+
+[feature.jazzy.dependencies]
+ros-jazzy-ros-core = "*"
+colcon-common-extensions = "*"
+cxx-compiler = "*"
+cmake = "*"
+ninja = "*"
+clang-tools = "*"
+clangdev = "*"
+ruff = "*"
+ty = "*"
+
+[tasks]
+
+# Browse documentation files.
+# No args: list all docs with metadata.
+# With args: print full content of specified files.
+# Usage: pixi run read-docs [file...]
+"read-docs" = "node scripts/read-docs.js"
+
+# Build a single ROS package by name
+# Usage: pixi run ros:build <package-name>
+"ros:build" = { cmd = "colcon build --packages-select", cwd = "ros" }
+
+# Build the entire ROS workspace in dev mode (symlink install, incremental)
+# Usage: pixi run ros:build:all
+"ros:build:all" = "nx run ros_ws:build-dev"
+
+# Build the shared interfaces package to generate necessary header/type files for other ros nodes
+# Usage: pixi run ros:build:interfaces
+"ros:build:interfaces" = { cmd = "colcon build --packages-select interfaces --symlink-install --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Debug", cwd = "ros" }
+
+# Build the entire ROS workspace in CI mode
+# Usage: pixi run ros:build:ci
+"ros:build:ci" = "nx run ros_ws:build-ci"
+
+# Run tests for a single package
+# Usage: pixi run test <package-name>
+"test" = "sh -c 'nx run $1:test' sh"
+
+# Run tests for all packages
+# Usage: pixi run test:all
+"test:all" = "nx run-many --target=test"
+
+# Format a single package (ruff for Python, clang-format for C++)
+# Usage: pixi run format <package-name>
+"format" = "sh -c 'nx run $1:format' sh"
+
+# Format all packages
+# Usage: pixi run format:all
+"format:all" = "nx run-many --target=format"
+
+# Run static analysis on a single package (ruff for Python, clang-tidy for C++)
+# Usage: pixi run lint <package-name>
+"lint" = "sh -c 'nx run $1:lint' sh"
+
+# Run static analysis on all packages
+# Usage: pixi run lint:all
+"lint:all" = "nx run-many --target=lint"
+
+# Run type checking on a single package (ty for Python)
+# Usage: pixi run typecheck <package-name>
+"typecheck" = "sh -c 'nx run $1:typecheck' sh"
+
+# Run type checking on all packages
+# Usage: pixi run typecheck:all
+"typecheck:all" = "nx run-many --target=typecheck"
+
+# Run spell checking on a single package (cspell)
+# Usage: pixi run cspell <package-name>
+"cspell" = "sh -c 'nx run $1:cspell' sh"
+
+# Run spell checking on all packages
+# Usage: pixi run cspell:all
+"cspell:all" = "nx run-many --target=cspell"
+
+# Run format, lint, typecheck, and cspell on a single package (use before pull request)
+# Usage: pixi run check <package-name>
+"check" = "sh -c 'nx run-many --projects=$1 --target=format,lint,typecheck,cspell' sh"
+
+# Run format, lint, typecheck, and cspell on all packages
+# Usage: pixi run check:all
+"check:all" = "nx run-many --target=format,lint,typecheck,cspell"
+
+# Add or update copyright headers in all source files
+# Usage: pixi run copyright
+"copyright" = "copywrite headers"
+
+# Preview copyright header changes without modifying files
+# Usage: pixi run copyright:check
+"copyright:check" = "copywrite headers --plan"
+
+# Launch the demo (runs demo_bringup launch file)
+# Usage: pixi run ros:demo
+"ros:demo" = "nx run ros_ws:run-demo"

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "demo_py_node",
+  "projectType": "library",
+  "root": "ros/src/demo_py_node",
+  "sourceRoot": "ros/src/demo_py_node/demo_py_node",
+  "targets": {
+    "format": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**/*.py"],
+      "options": {
+        "command": "ruff format --check {projectRoot}"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**/*.py"],
+      "options": {
+        "command": "ruff check {projectRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**/*.py"],
+      "options": {
+        "command": "ty check {projectRoot}"
+      }
+    },
+    "cspell": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
+      "options": {
+        "command": "cspell --no-progress --gitignore \"{projectRoot}/**\""
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["ros_ws"], "target": "build-dev" }],
+      "inputs": [
+        "{projectRoot}/demo_py_node/**",
+        "{projectRoot}/test/**",
+        "{projectRoot}/setup.py",
+        "{projectRoot}/setup.cfg",
+        "{projectRoot}/package.xml"
+      ],
+      "options": {
+        "cwd": "ros",
+        "command": "colcon test --packages-select demo_py_node --event-handlers console_direct+ && colcon test-result --verbose"
+      }
+    }
+  }
+}

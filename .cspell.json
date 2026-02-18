@@ -1,0 +1,43 @@
+{
+  "words": [
+    "bringup",
+    "buildtool",
+    "pytest",
+    "rclcpp",
+    "rclpy"
+  ],
+  "ignorePaths": [
+    "*.code-workspace",
+    "**/project.json",
+    "**/CMakeLists.txt",
+    "build",
+    "dist",
+    ".devcontainer",
+    "ruff.toml",
+    "ty.toml",
+    "pixi.toml",
+    ".clang-tidy",
+    "*.lock",
+    "package.xml"
+  ],
+  "ignoreRegExpList": [
+    "comment-tags"
+  ],
+  "patterns": [
+    {
+      "name": "comment-tags",
+      "pattern": "/(?:TODO|BUG|FIXME|XXX|HACK|NOTE)\\([-\\w\\.\\@,\\s\\&]*\\)/g"
+    }
+  ],
+  "languageSettings": [
+    {
+      // use with Markdown files
+      "languageId": "markdown",
+      // Exclude code.
+      "ignoreRegExpList": [
+        "/^\\s*```[\\s\\S]*?^\\s*```/gm"
+      ]
+    }
+  ],
+  "import": []
+}

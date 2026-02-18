@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "demo_cpp_node",
+  "projectType": "library",
+  "root": "ros/src/demo_cpp_node",
+  "sourceRoot": "ros/src/demo_cpp_node/src",
+  "targets": {
+    "format": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*.cpp",
+        "{projectRoot}/**/*.hpp",
+        "{projectRoot}/**/*.h"
+      ],
+      "options": {
+        "command": "find {projectRoot} -type f \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \\) | xargs -r clang-format --dry-run --Werror"
+      }
+    },
+    "cspell": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
+      "options": {
+        "command": "cspell --no-progress --gitignore \"{projectRoot}/**\""
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["ros_ws"], "target": "build-dev" }],
+      "inputs": [
+        "{projectRoot}/src/**",
+        "{projectRoot}/include/**",
+        "{projectRoot}/test/**",
+        "{projectRoot}/CMakeLists.txt",
+        "{projectRoot}/package.xml"
+      ],
+      "options": {
+        "cwd": "ros",
+        "command": "colcon test --packages-select demo_cpp_node --event-handlers console_direct+ && colcon test-result --verbose"
+      }
+    }
+  }
+}

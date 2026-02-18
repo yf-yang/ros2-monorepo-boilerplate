@@ -1,0 +1,15 @@
+{
+  "name": "demo_bringup",
+  "projectType": "library",
+  "root": "ros/src/demo_bringup",
+  "sourceRoot": "ros/src/demo_bringup",
+  "targets": {
+    "cspell": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
+      "options": {
+        "command": "cspell --no-progress --gitignore \"{projectRoot}/**\""
+      }
+    }
+  }
+}

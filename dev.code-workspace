@@ -1,0 +1,128 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": "."
+    },
+  ],
+  "extensions": {
+    "recommendations": [
+      "ms-iot.vscode-ros",
+      "ms-vscode.cpptools",
+      "ms-vscode.cpptools-themes",
+      "twxs.cmake",
+      "aaron-bond.better-comments",
+      "eamodio.gitlens",
+      "gruntfuggly.todo-tree",
+      "phil294.git-log--graph", // Git Lens graph is a paid feature, so use GitLG instead
+      "bradlc.vscode-tailwindcss",
+      "streetsidesoftware.code-spell-checker",
+      "tombi-toml.tombi",
+      "usernamehw.errorlen",
+      "ms-toolsai.jupyter",
+      "ms-python.python",
+      "charliermarsh.ruff",
+      "alefragnani.Bookmarks",
+      "unifiedjs.vscode-mdx",
+      "blueglassblock.better-json5",
+      "astral-sh.ty",
+    ]
+  },
+  "settings": {
+    "editor.rulers": [
+      100
+    ],
+    "editor.formatOnSave": false,
+    "todo-tree.general.tags": [
+      "BUG",
+      "FIXME",
+      "TODO",
+      "REFACTOR",
+      "OPTIMIZE",
+      "ALIGN"
+    ],
+    "todo-tree.regex.subTagRegex": "^\\s*\\((.*)\\)",
+    "todo-tree.tree.groupedBySubTag": true,
+    "todo-tree.tree.buttons.groupByTag": false,
+    "todo-tree.tree.buttons.viewStyle": false,
+    "todo-tree.tree.labelFormat": "${tag}${after}",
+    "python.defaultInterpreterPath": "${workspaceFolder:root}/.pixi/envs/default/bin/python",
+    "[markdown]": {
+      "editor.wordWrap": "bounded",
+      "editor.wordWrapColumn": 100
+    },
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.ruff": "explicit",
+        "source.organizeImports.ruff": "explicit"
+      },
+      "editor.tabSize": 2
+    },
+    "[toml]": {
+      "editor.defaultFormatter": "tombi-toml.tombi"
+    },
+    "todo-tree.regex.enableMultiLine": false,
+    "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|\\*|/\\*\\*|^|^[ \\t]*(-|\\d+.))\\s*($TAGS)",
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "debug.javascript.autoAttachFilter": "onlyWithFlag",
+    "better-comments.tags": [
+      {
+        "tag": "!",
+        "color": "#FF2D00"
+      },
+      {
+        "tag": "refactor",
+        "color": "#EBC334"
+      },
+      {
+        "tag": "optimize",
+        "color": "#EBC334"
+      },
+      {
+        "tag": "important",
+        "color": "#FF2D00"
+      },
+      {
+        "tag": "?",
+        "color": "#3498DB"
+      },
+      {
+        "tag": "//",
+        "color": "#474747",
+        "strikethrough": true
+      },
+      {
+        "tag": "todo",
+        "color": "#FF8C00"
+      },
+      {
+        "tag": "note",
+        "color": "#FF00F3"
+      },
+      {
+        "tag": "hack",
+        "color": "#F7ADDF"
+      },
+      {
+        "tag": "bug",
+        "color": "#FF2D00"
+      },
+      {
+        "tag": "xxx",
+        "color": "#C0ABE3"
+      },
+      {
+        "tag": "fixme",
+        "color": "#FF2D00"
+      },
+      {
+        "tag": "*",
+        "color": "#98C379"
+      }
+    ],
+    "errorLens.delay": 3000,
+    "cursorpyright.analysis.typeCheckingMode": "off",
+  }
+}

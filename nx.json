@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/nx-schema.json",
+  "installation": {
+    "version": "22.5.1"
+  },
+  "defaultBase": "main",
+  "tui": {
+    "enabled": false
+  },
+  "targetDefaults": {
+    "format": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "typecheck": {
+      "cache": true
+    },
+    "cspell": {
+      "cache": true
+    },
+    "build-dev": {
+      "cache": false
+    },
+    "build-ci": {
+      "cache": false
+    },
+    "test": {
+      "cache": true
+    },
+    "run-demo": {
+      "cache": false
+    }
+  }
+}

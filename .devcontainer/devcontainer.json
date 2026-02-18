@@ -1,0 +1,51 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+  "name": "Development Container",
+  "image": "dev-base",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [3000],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": ". ${NVM_DIR}/nvm.sh && nvm install --lts"
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        "twxs.cmake",
+        "aaron-bond.better-comments",
+        "eamodio.gitlens",
+        "gruntfuggly.todo-tree",
+        "phil294.git-log--graph", // Git Lens graph is a paid feature, so use GitLG instead
+        "streetsidesoftware.code-spell-checker",
+        "tombi-toml.tombi",
+        "usernamehw.errorlen",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "unifiedjs.vscode-mdx",
+        "chunsen.bracket-select",
+        "astral-sh.ty"
+      ]
+    }
+  },
+  "containerEnv": {
+    "PIXI_CACHE_DIR": "/dc/pixi-cache"
+  },
+  "runArgs": [
+    "--net=host",
+    "--pid=host",
+    "--ipc=host"
+  ],
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind",
+    "source=${localWorkspaceFolderBasename}-pixi,target=${containerWorkspaceFolder}/.pixi,type=volume",
+    "source=pixi-global-cache,target=/dc/pixi-cache,type=volume"
+  ],
+  "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/postCreateCommand.sh",
+  "postStartCommand": "ZSH=~/.oh-my-zsh ~/.oh-my-zsh/tools/upgrade.sh",
+  "remoteUser": "vscode"
+}

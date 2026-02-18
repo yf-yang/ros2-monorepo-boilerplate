@@ -1,0 +1,64 @@
+{
+  "name": "Base dev container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers-extra/features/nx-npm:1": {},
+
+    // go
+    "ghcr.io/devcontainers/features/go:1": {},
+    
+    // typescript
+    "ghcr.io/joshuanianji/devcontainer-features/mount-pnpm-store:1": {},
+
+    // AI coding
+    "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {},
+
+    // Shell utils
+    "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "installOhMyZshConfig": true,
+      "upgradePackages": true
+    },
+    "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {
+      // Auto completion support:
+      //   - nvm
+      //   - uv
+      // aliases: the `als` command https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/aliases
+      // common-aliases: more aliases https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/common-aliases
+      // git-commit: commands for conventional commit https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git-commit
+      // git-auto-fetch (x): automatically run git fetch every 60 seconds
+      // history: commands to search command history https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/history
+      // pre-commit: commands to run pre commit hooks https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/pre-commit
+      // python: aliases for python https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/python
+      // z: the `z` command that searches previously visited path https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/z
+      "plugins": "aliases common-aliases git-commit history nvm pre-commit z zsh-syntax-highlighting zsh-autosuggestions uv",
+      // zsh command line syntax highlighting and autosuggestions
+      "omzPlugins": "https://github.com/zsh-users/zsh-syntax-highlighting.git https://github.com/zsh-users/zsh-autosuggestions.git"
+    },
+
+    // Other
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+
+    // Commands
+    "ghcr.io/wxw-matt/devcontainer-features/command_runner:latest": {
+			"command1": "npm i -g cspell",
+      "command2": "su - vscode -c 'curl -fsSL https://claude.ai/install.sh | bash'",
+			"command3": "go install github.com/hashicorp/copywrite@latest"
+    }
+  },
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/devcontainers/features/go",
+    "ghcr.io/wxw-matt/devcontainer-features/command_runner"
+  ],
+  "remoteUser": "vscode"
+}
