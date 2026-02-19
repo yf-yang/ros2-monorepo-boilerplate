@@ -1,7 +1,7 @@
 # Ruff configuration for the ROS2 workspace
 # https://docs.astral.sh/ruff/configuration/
 
-line-length = 103  # Allow a few more characters for long lines
+line-length = 123  # Allow a few more characters for long lines
 indent-width = 2
 
 [lint]

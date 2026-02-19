@@ -1,4 +1,4 @@
 BasedOnStyle: Google
 IndentWidth: 2
 # Allow a few more characters for long lines
-ColumnLimit: 103
+ColumnLimit: 123
