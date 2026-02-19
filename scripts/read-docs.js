@@ -54,9 +54,11 @@ program
       const files = collectMdFiles(DOCS_DIR);
       for (const absPath of files) {
         const { attributes } = fm(readFileSync(absPath, 'utf8'));
-        const summary = blank(attributes?.summary);
+        const title = blank(attributes?.title);
+        const description = blank(attributes?.description);
         const readWhen = blank(attributes?.read_when);
-        console.log(`${relPath(absPath)} - ${summary}`);
+        console.log(`${relPath(absPath)} - ${title}`);
+        console.log(`\tDescription: ${description}`);
         console.log(`\tRead When: ${readWhen}`);
       }
     }

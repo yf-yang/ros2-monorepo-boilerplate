@@ -2,6 +2,8 @@
   "words": [
     "bringup",
     "buildtool",
+    "colcon",
+    "copywrite",
     "pytest",
     "rclcpp",
     "rclpy"

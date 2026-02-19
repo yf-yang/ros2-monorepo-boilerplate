@@ -71,6 +71,10 @@ instance/
 # Sphinx documentation
 docs/_build/
 
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
 # PyBuilder
 .pybuilder/
 target/

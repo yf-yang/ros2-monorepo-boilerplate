@@ -35,6 +35,10 @@ ty = "*"
 # Usage: pixi run read-docs [file...]
 "read-docs" = "node scripts/read-docs.js"
 
+# Start a documentation site locally
+# Usage: pixi run doc-site
+"doc-site" = "pnpm exec vitepress dev docs"
+
 # Build a single ROS package by name
 # Usage: pixi run ros:build <package-name>
 "ros:build" = { cmd = "colcon build --packages-select", cwd = "ros" }
