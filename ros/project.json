@@ -39,7 +39,7 @@
       ],
       "options": {
         "cwd": "ros",
-        "command": "python3 -c \"import json,glob;e=[x for f in glob.glob('build/*/compile_commands.json') for x in json.load(open(f))];json.dump(e,open('build/compile_commands.json','w'))\" && find src -type f -name '*.cpp' | xargs -r clang-tidy -p build --warnings-as-errors=*"
+        "command": "python3 -c \"import json,glob;e=[x for f in glob.glob('build/*/compile_commands.json') for x in json.load(open(f))];json.dump(e,open('build/compile_commands.json','w'))\" && run-clang-tidy -p build -warnings-as-errors=* src"
       }
     },
     "run-demo": {
