@@ -1,0 +1,14 @@
+version: v2
+plugins:
+  # Local protoc: generated C++ code is ABI-coupled with libprotobuf,
+  # so the protoc version must match the libprotobuf installed by pixi.
+  - protoc_builtin: cpp
+    out: ros/generated/proto
+    protoc_path: .pixi/envs/default/bin/protoc
+
+  # Remote plugin: generated TS code depends on the @bufbuild/protobuf npm
+  # package, which has no version coupling with protoc. Safe to use remote.
+  - remote: buf.build/bufbuild/es
+    out: demo_upper/generated/proto
+    opt:
+      - target=ts

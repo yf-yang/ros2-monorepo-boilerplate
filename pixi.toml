@@ -48,10 +48,9 @@ libzenohcxx = "*"
 # Usage: pixi run proto:lint
 "proto:lint" = "buf lint"
 
-# Generate TypeScript and C++ code from proto definitions
-# C++ uses protoc_builtin (matches installed libprotobuf), TypeScript uses buf remote plugin
+# Generate code from proto definitions
 # Usage: pixi run proto:gen
-"proto:gen" = "buf generate --template proto/buf.gen.cpp.yaml && buf generate --template proto/buf.gen.ts.yaml"
+"proto:gen" = "buf generate --template proto/buf.gen.yaml"
 
 # Start a documentation site locally
 # Usage: pixi run doc-site
