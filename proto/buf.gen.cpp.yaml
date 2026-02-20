@@ -1,0 +1,6 @@
+version: v2
+plugins:
+  - protoc_builtin: cpp
+    out: ros/generated/proto
+    # Use the protoc in the pixi environment installed from libprotobuf
+    protoc_path: .pixi/envs/default/bin/protoc

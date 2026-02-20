@@ -17,5 +17,11 @@ def generate_launch_description() -> LaunchDescription:
                 name="demo_py_node",
                 output="screen",
             ),
+            Node(
+                package="bridge",
+                executable="bridge_node",
+                name="bridge_node",
+                output="screen",
+            ),
         ]
     )

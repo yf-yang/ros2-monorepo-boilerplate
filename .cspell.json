@@ -1,12 +1,19 @@
 {
   "words": [
     "bringup",
+    "bufbuild",
     "buildtool",
     "colcon",
     "copywrite",
+    "fzstd",
+    "libprotobuf",
+    "mcap",
+    "protoc",
     "pytest",
     "rclcpp",
-    "rclpy"
+    "rclpy",
+    "rosout",
+    "zenoh"
   ],
   "ignorePaths": [
     "*.code-workspace",
@@ -14,6 +21,7 @@
     "**/CMakeLists.txt",
     "build",
     "dist",
+    "generated",
     ".devcontainer",
     "ruff.toml",
     "ty.toml",

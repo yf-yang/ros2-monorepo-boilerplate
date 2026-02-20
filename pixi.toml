@@ -26,14 +26,32 @@ clang-tools = "*"
 clangdev = "*"
 ruff = "*"
 ty = "*"
+buf = "*"
+libprotobuf = "*"
+ros-jazzy-mcap-vendor = "*"
+ros-jazzy-std-msgs = "*"
+libzenohc = "*"
+libzenohcxx = "*"
 
 [tasks]
 
-# Browse documentation files.
-# No args: list all docs with metadata.
-# With args: print full content of specified files.
-# Usage: pixi run read-docs [file...]
-"read-docs" = "node scripts/read-docs.js"
+# List docs metadata, optionally filtered by glob patterns relative to docs/.
+# Usage: pixi run list-docs [pattern...]
+"list-docs" = "node scripts/docs.js list"
+
+# Print full content of docs matching glob patterns relative to docs/.
+# Caution: output can be large; prefer list-docs first to identify relevant files.
+# Usage: pixi run read-docs <pattern...>
+"read-docs" = "node scripts/docs.js read"
+
+# Lint proto definitions with buf
+# Usage: pixi run proto:lint
+"proto:lint" = "buf lint"
+
+# Generate TypeScript and C++ code from proto definitions
+# C++ uses protoc_builtin (matches installed libprotobuf), TypeScript uses buf remote plugin
+# Usage: pixi run proto:gen
+"proto:gen" = "buf generate --template proto/buf.gen.cpp.yaml && buf generate --template proto/buf.gen.ts.yaml"
 
 # Start a documentation site locally
 # Usage: pixi run doc-site
@@ -114,3 +132,11 @@ ty = "*"
 # Launch the demo (runs demo_bringup launch file)
 # Usage: pixi run ros:demo
 "ros:demo" = "nx run ros_ws:run-demo"
+
+# Subscribe to live collector frames from the upper-host demo CLI
+# Usage: pixi run demo:upper:live [-- --host <host> --port <port>]
+"demo:upper:live" = "demo_upper/node_modules/.bin/tsx demo_upper/src/cli.ts live"
+
+# Replay collector frames from a local mcap file via the upper-host demo CLI
+# Usage: pixi run demo:upper:replay -- --file <path>
+"demo:upper:replay" = "demo_upper/node_modules/.bin/tsx demo_upper/src/cli.ts replay"

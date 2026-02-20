@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "demo_upper",
+  "projectType": "application",
+  "root": "demo_upper",
+  "sourceRoot": "demo_upper/src",
+  "targets": {
+    "cspell": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
+      "options": {
+        "command": "cspell --no-progress --gitignore \"{projectRoot}/**\""
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/src/**", "{projectRoot}/tsconfig.json"],
+      "options": {
+        "command": "pnpm exec tsc --noEmit --project {projectRoot}/tsconfig.json"
+      }
+    }
+  }
+}

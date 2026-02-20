@@ -12,6 +12,7 @@
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>demo_cpp_node</exec_depend>
   <exec_depend>demo_py_node</exec_depend>
+  <exec_depend>bridge</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

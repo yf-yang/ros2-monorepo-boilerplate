@@ -69,3 +69,6 @@ pixi run check:all
 pixi run copyright:check # 检查所有文件的版权信息是否完整
 pixi run copyright # 添加或更新所有文件的版权信息
 ```
+
+## 其它
+注意环境中安装了zsh的common-aliases插件，当你执行`rm`,`cp`,`mv`等命令时，请使用`\rm``\cp`,`\mv`以规避交互式确认项

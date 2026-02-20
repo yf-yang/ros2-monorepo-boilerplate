@@ -1,0 +1,6 @@
+version: v2
+plugins:
+  - remote: buf.build/bufbuild/es
+    out: demo_upper/generated/proto
+    opt:
+      - target=ts

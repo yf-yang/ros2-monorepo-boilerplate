@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "bridge",
+  "projectType": "library",
+  "root": "ros/src/bridge",
+  "sourceRoot": "ros/src/bridge/src",
+  "targets": {
+    "format": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*.cpp",
+        "{projectRoot}/**/*.hpp",
+        "{projectRoot}/**/*.h"
+      ],
+      "options": {
+        "command": "find {projectRoot} -type f \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \\) | xargs -r -P 0 -n 4 clang-format --dry-run --Werror"
+      }
+    },
+    "cspell": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
+      "options": {
+        "command": "cspell --no-progress --gitignore \"{projectRoot}/**\""
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["ros_ws"], "target": "build-dev" }],
+      "inputs": [
+        "{projectRoot}/src/**",
+        "{projectRoot}/CMakeLists.txt",
+        "{projectRoot}/package.xml"
+      ],
+      "options": {
+        "cwd": "ros",
+        "command": "colcon test --packages-select bridge --event-handlers console_direct+ && colcon test-result --verbose"
+      }
+    }
+  }
+}

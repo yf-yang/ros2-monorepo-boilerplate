@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bridge.v1;
+
+message TopicMessage {
+  string topic = 1;
+  string sender = 2;
+  uint32 sequence = 3;
+  string content = 4;
+  uint64 timestamp_ns = 5;
+  string source_namespace = 6;
+}
