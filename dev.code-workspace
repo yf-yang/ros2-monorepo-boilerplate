@@ -9,6 +9,7 @@
     "recommendations": [
       "ms-iot.vscode-ros",
       "ms-vscode.cpptools",
+      "anysphere.cpptools",
       "ms-vscode.cpptools-themes",
       "twxs.cmake",
       "aaron-bond.better-comments",
@@ -21,11 +22,13 @@
       "usernamehw.errorlen",
       "ms-toolsai.jupyter",
       "ms-python.python",
+      "anysphere.cursorpyright",
       "charliermarsh.ruff",
       "alefragnani.Bookmarks",
       "unifiedjs.vscode-mdx",
       "blueglassblock.better-json5",
       "astral-sh.ty",
+      "oxc.oxc-vscode",
     ]
   },
   "settings": {
@@ -124,5 +127,34 @@
     ],
     "errorLens.delay": 3000,
     "cursorpyright.analysis.typeCheckingMode": "off",
+    "oxc.lint.run": "onSave",
+    "[javascript]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.oxc": "explicit"
+      }
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.oxc": "explicit"
+      }
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.oxc": "explicit"
+      }
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.oxc": "explicit"
+      }
+    },
   }
 }

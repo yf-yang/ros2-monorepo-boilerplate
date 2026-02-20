@@ -15,8 +15,8 @@
       "extensions": [
         "ms-iot.vscode-ros",
         "ms-vscode.cpptools",
+        "anysphere.cpptools",
         "ms-vscode.cpptools-themes",
-        "twxs.cmake",
         "aaron-bond.better-comments",
         "eamodio.gitlens",
         "gruntfuggly.todo-tree",
@@ -25,6 +25,7 @@
         "tombi-toml.tombi",
         "usernamehw.errorlen",
         "ms-python.python",
+        "anysphere.cursorpyright",
         "charliermarsh.ruff",
         "unifiedjs.vscode-mdx",
         "chunsen.bracket-select",

@@ -22,7 +22,7 @@
         "{workspaceRoot}/.oxlintrc.json"
       ],
       "options": {
-        "command": "pnpm exec oxlint {projectRoot}/src"
+        "command": "pnpm exec oxlint --type-aware {projectRoot}/src"
       }
     },
     "cspell": {
@@ -40,7 +40,7 @@
         "{workspaceRoot}/tsconfig.base.json"
       ],
       "options": {
-        "command": "pnpm exec tsc --noEmit --project {projectRoot}/tsconfig.json"
+        "command": "pnpm exec tsgo --noEmit --project {projectRoot}/tsconfig.json"
       }
     }
   }

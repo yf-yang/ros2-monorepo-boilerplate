@@ -55,10 +55,12 @@ C++：
 
 TypeScript：
 
-- 工具：`oxlint`
+- 工具：`oxlint --type-aware`
 - 配置：`.oxlintrc.json`
+- 依赖：`oxlint-tsgolint`（提供 type-aware linting 所需的 tsgo 绑定）
 - 入口：`pixi run lint <package-name>` / `pixi run lint:all`
 - 文档：https://oxc.rs/docs/guide/usage/linter
+- type-aware 文档：https://oxc.rs/docs/guide/usage/linter/type-aware
 - 规则：https://oxc.rs/docs/guide/usage/linter/rules
 - 可配置选项：https://oxc.rs/docs/guide/usage/linter/config-file-reference
 
@@ -73,9 +75,11 @@ Python：
 - 规则：https://docs.astral.sh/ty/reference/rules/
 - 可配置选项：https://docs.astral.sh/ty/configuration/
 
+<!-- TODO: 当 TypeScript 7 正式发布后，将 @typescript/native-preview 迁移为正式包，并删除此注释 -->
+
 TypeScript：
 
-- 工具：`tsc --noEmit`
+- 工具：`tsgo --noEmit`（`@typescript/native-preview`，即 TypeScript 7 native 编译器的预览版）
 - 配置：`tsconfig.base.json`（根级共享）、各包 `tsconfig.json`（通过 `extends` 继承）
 - 入口：`pixi run typecheck <package-name>` / `pixi run typecheck:all`
 - 文档：https://www.typescriptlang.org/tsconfig/
