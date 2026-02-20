@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "proto",
+  "root": "proto",
+  "targets": {
+    "proto-gen": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{workspaceRoot}/proto/**/*.proto",
+        "{workspaceRoot}/proto/buf.gen.yaml"
+      ],
+      "outputs": [
+        "{workspaceRoot}/ros/generated/proto",
+        "{workspaceRoot}/demo_upper/generated/proto"
+      ],
+      "options": {
+        "command": "buf generate --template proto/buf.gen.yaml"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{workspaceRoot}/proto/**/*.proto",
+        "{workspaceRoot}/buf.yaml"
+      ],
+      "options": {
+        "command": "buf lint"
+      }
+    }
+  }
+}

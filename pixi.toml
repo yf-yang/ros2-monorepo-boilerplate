@@ -44,13 +44,13 @@ libzenohcxx = "*"
 # Usage: pixi run read-docs <pattern...>
 "read-docs" = "node scripts/docs.js read"
 
-# Lint proto definitions with buf
+# Lint proto definitions with buf (cached via nx)
 # Usage: pixi run proto:lint
-"proto:lint" = "buf lint"
+"proto:lint" = "nx run proto:lint"
 
-# Generate code from proto definitions
+# Generate code from proto definitions (cached via nx)
 # Usage: pixi run proto:gen
-"proto:gen" = "buf generate --template proto/buf.gen.yaml"
+"proto:gen" = "nx run proto:proto-gen"
 
 # Start a documentation site locally
 # Usage: pixi run doc-site
@@ -80,7 +80,65 @@ libzenohcxx = "*"
 # Usage: pixi run test:all
 "test:all" = "nx run-many --target=test"
 
-# Format a single package (ruff for Python, clang-format for C++)
+# ─── C++ ───
+
+# Check C++ files formatting without modifying (exit 1 if unformatted)
+# Usage: pixi run clang-format <file...>
+"clang-format" = "clang-format --dry-run --Werror"
+
+# Format C++ files in-place with clang-format
+# Usage: pixi run clang-format:fix <file...>
+"clang-format:fix" = "clang-format -i"
+
+# Run clang-tidy on C++ files (runs configure if compile_commands.json is missing)
+# Usage: pixi run clang-tidy <file...>
+"clang-tidy" = "sh -c '{ test -f ros/build/compile_commands.json || nx run ros_ws:configure; } && clang-tidy -p ros/build \"--warnings-as-errors=*\" \"$@\"' sh"
+
+# ─── Python ───
+
+# Check Python files formatting without modifying (exit 1 if unformatted)
+# Usage: pixi run ruff-format <file...>
+"ruff-format" = "ruff format --check"
+
+# Format Python files in-place with ruff
+# Usage: pixi run ruff-format:fix <file...>
+"ruff-format:fix" = "ruff format"
+
+# Lint Python files with ruff (check only)
+# Usage: pixi run ruff-check <file...>
+"ruff-check" = "ruff check"
+
+# Lint and auto-fix Python files with ruff
+# Usage: pixi run ruff-check:fix <file...>
+"ruff-check:fix" = "ruff check --fix"
+
+# Type-check Python files with ty
+# Usage: pixi run ty <file-or-dir...>
+"ty" = "ty check"
+
+# ─── TypeScript / JavaScript ───
+
+# Check TypeScript/JavaScript files formatting without modifying (exit 1 if unformatted)
+# Usage: pixi run oxfmt <file...>
+"oxfmt" = "pnpm exec oxfmt --check"
+
+# Format TypeScript/JavaScript files in-place with oxfmt
+# Usage: pixi run oxfmt:fix <file...>
+"oxfmt:fix" = "pnpm exec oxfmt --write"
+
+# Lint TypeScript/JavaScript files with oxlint
+# Usage: pixi run oxlint <file...>
+"oxlint" = "pnpm exec oxlint"
+
+# ─── Cross-language ───
+
+# Spell-check files with cspell
+# Usage: pixi run cspell:files <file...>
+"cspell:files" = "cspell --no-progress --gitignore"
+
+# ─── Package-level tasks (via nx) ───
+
+# Format a single package (ruff for Python, clang-format for C++, oxfmt for TS)
 # Usage: pixi run format <package-name>
 "format" = "sh -c 'nx run $1:format' sh"
 
@@ -88,7 +146,7 @@ libzenohcxx = "*"
 # Usage: pixi run format:all
 "format:all" = "nx run-many --target=format"
 
-# Run static analysis on a single package (ruff for Python, clang-tidy for C++)
+# Run static analysis on a single package (ruff for Python, clang-tidy for C++, oxlint for TS)
 # Usage: pixi run lint <package-name>
 "lint" = "sh -c 'nx run $1:lint' sh"
 
@@ -96,7 +154,7 @@ libzenohcxx = "*"
 # Usage: pixi run lint:all
 "lint:all" = "nx run-many --target=lint"
 
-# Run type checking on a single package (ty for Python)
+# Run type checking on a single package (ty for Python, tsgo for TS)
 # Usage: pixi run typecheck <package-name>
 "typecheck" = "sh -c 'nx run $1:typecheck' sh"
 
@@ -127,6 +185,8 @@ libzenohcxx = "*"
 # Preview copyright header changes without modifying files
 # Usage: pixi run copyright:check
 "copyright:check" = "copywrite headers --plan"
+
+# ─── Demo / Launch ───
 
 # Launch the demo (runs demo_bringup launch file)
 # Usage: pixi run ros:demo

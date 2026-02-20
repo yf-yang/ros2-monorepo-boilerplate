@@ -53,6 +53,7 @@ pixi run ros:build:all
 你应当在执行任务完成后做代码质量的检查并修复问题
 对于比较大的架构/feature改动，你应优先确保功能的完整与正确，其后才是代码质量。单次任务中代码质量检查未通过也是允许的，你可以将其留到整体实现完成后再检查修复，或者在量很大时，告知人类再另行修复
 ```
+# 包级（通过 nx 编排，带缓存）
 pixi run test <package-name>
 pixi run format <package-name>
 pixi run lint <package-name>
@@ -69,6 +70,25 @@ pixi run check:all
 
 pixi run copyright:check # 检查所有文件的版权信息是否完整
 pixi run copyright # 添加或更新所有文件的版权信息
+
+# 文件级（直接调用工具，不经过 nx）
+# 命名约定：默认 = 只检查不修改，:fix = 写入/修复
+# C++
+pixi run clang-format <file...>      # 检查格式
+pixi run clang-format:fix <file...>  # 就地格式化
+pixi run clang-tidy <file...>        # 静态分析
+# Python
+pixi run ruff-format <file...>       # 检查格式
+pixi run ruff-format:fix <file...>   # 就地格式化
+pixi run ruff-check <file...>        # lint
+pixi run ruff-check:fix <file...>    # lint + 自动修复
+pixi run ty <file-or-dir...>         # 类型检查
+# TypeScript / JavaScript
+pixi run oxfmt <file...>             # 检查格式
+pixi run oxfmt:fix <file...>         # 就地格式化
+pixi run oxlint <file...>            # lint
+# Cross-language
+pixi run cspell:files <file...>      # 拼写检查
 ```
 
 ## 其它

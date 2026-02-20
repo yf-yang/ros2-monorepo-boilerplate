@@ -26,6 +26,12 @@
     "build-ci": {
       "cache": false
     },
+    "configure": {
+      "cache": true
+    },
+    "proto-gen": {
+      "cache": true
+    },
     "test": {
       "cache": true
     },

@@ -29,17 +29,26 @@
         "command": "colcon build --symlink-install --event-handlers console_cohesion+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
       }
     },
-    "lint": {
+    "configure": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build-dev"],
+      "dependsOn": [{ "projects": ["proto"], "target": "proto-gen" }],
       "inputs": [
-        "{projectRoot}/src/**/*.cpp",
-        "{projectRoot}/src/**/*.hpp",
-        "{projectRoot}/src/**/*.h"
+        "{projectRoot}/src/interfaces/CMakeLists.txt",
+        "{projectRoot}/src/interfaces/package.xml",
+        "{projectRoot}/src/interfaces/msg/**",
+        "{projectRoot}/src/demo_cpp_node/CMakeLists.txt",
+        "{projectRoot}/src/demo_cpp_node/package.xml",
+        "{projectRoot}/src/bridge/CMakeLists.txt",
+        "{projectRoot}/src/bridge/package.xml"
+      ],
+      "outputs": [
+        "{workspaceRoot}/ros/build/compile_commands.json",
+        "{workspaceRoot}/ros/build/demo_cpp_node/compile_commands.json",
+        "{workspaceRoot}/ros/build/bridge/compile_commands.json"
       ],
       "options": {
         "cwd": "ros",
-        "command": "python3 -c \"import json,glob;e=[x for f in glob.glob('build/*/compile_commands.json') for x in json.load(open(f))];json.dump(e,open('build/compile_commands.json','w'))\" && run-clang-tidy -p build -warnings-as-errors=* src"
+        "command": "colcon build --packages-select interfaces --symlink-install --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && colcon build --packages-skip interfaces --symlink-install --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --cmake-target help && python3 -c \"import json,glob;e=[x for f in glob.glob('build/*/compile_commands.json') for x in json.load(open(f))];json.dump(e,open('build/compile_commands.json','w'))\""
       }
     },
     "run-demo": {

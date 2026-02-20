@@ -16,6 +16,19 @@
         "command": "find {projectRoot} -type f \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \\) | xargs -r -P 0 -n 4 clang-format --dry-run --Werror"
       }
     },
+    "lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["ros_ws"], "target": "configure" }],
+      "inputs": [
+        "{projectRoot}/src/**/*.cpp",
+        "{projectRoot}/include/**/*.hpp",
+        "{projectRoot}/include/**/*.h",
+        "{workspaceRoot}/ros/.clang-tidy"
+      ],
+      "options": {
+        "command": "python3 scripts/run-clang-tidy-filter.py -quiet -p ros/build/demo_cpp_node -warnings-as-errors=* ros/src/demo_cpp_node/src/ ros/src/demo_cpp_node/include/"
+      }
+    },
     "cspell": {
       "executor": "nx:run-commands",
       "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
