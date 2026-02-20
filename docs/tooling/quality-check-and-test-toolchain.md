@@ -25,6 +25,14 @@ C++：
 - 文档：https://clang.llvm.org/docs/ClangFormat.html
 - 规则：https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
+TypeScript：
+
+- 工具：`oxfmt --check`
+- 配置：`.oxfmtrc.json`
+- 入口：`pixi run format <package-name>` / `pixi run format:all`
+- 文档：https://oxc.rs/docs/guide/usage/formatter
+- 可配置选项：https://oxc.rs/docs/guide/usage/formatter/config-file-reference
+
 ## lint
 
 Python：
@@ -45,6 +53,15 @@ C++：
 - 文档：https://clang.llvm.org/extra/clang-tidy/
 - 规则：https://clang.llvm.org/extra/clang-tidy/checks/list.html
 
+TypeScript：
+
+- 工具：`oxlint`
+- 配置：`.oxlintrc.json`
+- 入口：`pixi run lint <package-name>` / `pixi run lint:all`
+- 文档：https://oxc.rs/docs/guide/usage/linter
+- 规则：https://oxc.rs/docs/guide/usage/linter/rules
+- 可配置选项：https://oxc.rs/docs/guide/usage/linter/config-file-reference
+
 ## typecheck
 
 Python：
@@ -55,6 +72,13 @@ Python：
 - 文档：https://docs.astral.sh/ty/
 - 规则：https://docs.astral.sh/ty/reference/rules/
 - 可配置选项：https://docs.astral.sh/ty/configuration/
+
+TypeScript：
+
+- 工具：`tsc --noEmit`
+- 配置：`tsconfig.base.json`（根级共享）、各包 `tsconfig.json`（通过 `extends` 继承）
+- 入口：`pixi run typecheck <package-name>` / `pixi run typecheck:all`
+- 文档：https://www.typescriptlang.org/tsconfig/
 
 ## cspell
 

@@ -8,6 +8,8 @@
     "commander": "^14.0.3",
     "fast-glob": "^3.3.3",
     "front-matter": "^4.0.2",
+    "oxfmt": "^0.34.0",
+    "oxlint": "^1.49.0",
     "vitepress": "^1.6.4"
   }
 }

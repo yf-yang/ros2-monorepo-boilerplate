@@ -77,10 +77,7 @@ function processMiniMcap(data: Uint8Array): void {
         try {
           decodeAndPrint(schema.name, record.data, channel.topic);
         } catch (err) {
-          console.error(
-            `Failed to decode ${schema.name} on ${channel.topic}:`,
-            (err as Error).message
-          );
+          console.error(`Failed to decode ${schema.name} on ${channel.topic}:`, (err as Error).message);
         }
         break;
       }

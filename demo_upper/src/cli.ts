@@ -6,9 +6,7 @@ import { program } from "commander";
 import { runLive } from "./live.ts";
 import { runReplay } from "./replay.ts";
 
-program
-  .name("demo-upper")
-  .description("Upper-host CLI for bridge data");
+program.name("demo-upper").description("Upper-host CLI for bridge data");
 
 program
   .command("live")

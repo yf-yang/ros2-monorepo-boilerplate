@@ -23,10 +23,8 @@ type Decoder = (data: ArrayLike<number>) => TopicMessage | Log;
  * Schema-name to decoder registry.
  */
 const DECODERS: Record<string, Decoder> = {
-  "bridge.v1.TopicMessage": (data) =>
-    fromBinary(TopicMessageSchema, new Uint8Array(data)),
-  "foxglove.Log": (data) =>
-    fromBinary(LogSchema, new Uint8Array(data)),
+  "bridge.v1.TopicMessage": (data) => fromBinary(TopicMessageSchema, new Uint8Array(data)),
+  "foxglove.Log": (data) => fromBinary(LogSchema, new Uint8Array(data)),
 };
 
 /**
@@ -43,9 +41,7 @@ export function decodeMessage(schemaName: string, data: ArrayLike<number>): Topi
  */
 export function printTopicMessage(msg: TopicMessage, topic: string): void {
   const tsSec = Number(msg.timestampNs) / 1e9;
-  console.log(
-    `  [${topic}] ${msg.sender} #${msg.sequence}: "${msg.content}" (t=${tsSec.toFixed(3)})`
-  );
+  console.log(`  [${topic}] ${msg.sender} #${msg.sequence}: "${msg.content}" (t=${tsSec.toFixed(3)})`);
 }
 
 /**
@@ -55,9 +51,7 @@ export function printFoxgloveLog(msg: Log): void {
   const level = FOXGLOVE_LOG_LEVELS[msg.level] || `LVL${msg.level}`;
   const ts = msg.timestamp;
   const tsSec = ts ? Number(ts.seconds) + ts.nanos / 1e9 : 0;
-  console.log(
-    `  [${level}] ${msg.name}: ${msg.message} (t=${tsSec.toFixed(3)})`
-  );
+  console.log(`  [${level}] ${msg.name}: ${msg.message} (t=${tsSec.toFixed(3)})`);
 }
 
 /**

@@ -47,9 +47,7 @@ export async function runReplay({ file }: ReplayOptions): Promise<void> {
     },
   });
 
-  console.log(
-    `Channels: ${[...reader.channelsById.values()].map((c) => c.topic).join(", ")}`
-  );
+  console.log(`Channels: ${[...reader.channelsById.values()].map((c) => c.topic).join(", ")}`);
 
   let messageCount = 0;
 
@@ -65,7 +63,7 @@ export async function runReplay({ file }: ReplayOptions): Promise<void> {
     } catch (err) {
       console.error(
         `Failed to decode ${schema.name} on ${channel.topic} at logTime ${message.logTime}:`,
-        (err as Error).message
+        (err as Error).message,
       );
     }
   }

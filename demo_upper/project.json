@@ -5,6 +5,26 @@
   "root": "demo_upper",
   "sourceRoot": "demo_upper/src",
   "targets": {
+    "format": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{workspaceRoot}/.oxfmtrc.json"
+      ],
+      "options": {
+        "command": "pnpm exec oxfmt --check {projectRoot}/src"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{workspaceRoot}/.oxlintrc.json"
+      ],
+      "options": {
+        "command": "pnpm exec oxlint {projectRoot}/src"
+      }
+    },
     "cspell": {
       "executor": "nx:run-commands",
       "inputs": ["{projectRoot}/**", "{workspaceRoot}/.cspell.json"],
@@ -14,7 +34,11 @@
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "inputs": ["{projectRoot}/src/**", "{projectRoot}/tsconfig.json"],
+      "inputs": [
+        "{projectRoot}/src/**",
+        "{projectRoot}/tsconfig.json",
+        "{workspaceRoot}/tsconfig.base.json"
+      ],
       "options": {
         "command": "pnpm exec tsc --noEmit --project {projectRoot}/tsconfig.json"
       }
