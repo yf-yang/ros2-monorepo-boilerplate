@@ -22,9 +22,10 @@
 
 ### 查阅文档
 ```
-pixi run read-docs # 列出所有文档的元数据，打印的路径相对于docs/目录
-pixi run read-docs <file1> <file2> ... # 打印指定文档的完整内容，路径相对于docs/目录
+pixi run list-docs [pattern...]  # 列出匹配的文档元数据（不提供pattern则列出全部）
+pixi run read-docs <pattern...>  # 打印匹配文档的完整内容（token消耗大，应先用list-docs确认目标再使用）
 ```
+pattern 为 glob，相对于 `docs/` 目录匹配文件路径。多个 pattern 之间是 OR 关系。
 ### 更新文档
 文档里可以使用中文
 - 更新`AGENTS.md`：只有各类AI请求需要阅读的公共信息才应更新到此文件中，例如规范、常用开发工作流、仓库的通用架构等。你应当用尽量简练的语言描述必要信息，由于AI的知识储备很丰富，因此不需要解释太多。细节信息应当调整到`docs/`下的文档中
