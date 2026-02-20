@@ -34,7 +34,7 @@ export async function runLive({ host = "localhost", port = 10000 }: LiveOptions 
         const mcapBytes = sample.payload().toBytes();
         processMiniMcap(mcapBytes);
       } catch (err) {
-        console.error("Failed to process mini-MCAP:", (err as Error).message);
+        console.error("Failed to process mini-MCAP:", err instanceof Error ? err.message : String(err));
       }
     },
   });
@@ -77,7 +77,10 @@ function processMiniMcap(data: Uint8Array): void {
         try {
           decodeAndPrint(schema.name, record.data, channel.topic);
         } catch (err) {
-          console.error(`Failed to decode ${schema.name} on ${channel.topic}:`, (err as Error).message);
+          console.error(
+            `Failed to decode ${schema.name} on ${channel.topic}:`,
+            err instanceof Error ? err.message : String(err),
+          );
         }
         break;
       }

@@ -2,9 +2,14 @@
 //
 // Licensed under the Apache License, Version 2.0.
 
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/timestamp.pb.h>
+
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <mcap_vendor/mcap/writer.hpp>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -13,13 +18,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-#include <mcap_vendor/mcap/writer.hpp>
-
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/timestamp.pb.h>
-
 #include <zenoh.hxx>
 
 #include "bridge/topic_message.pb.h"
@@ -31,52 +29,54 @@
 using namespace std::chrono_literals;
 using Greeting = interfaces::msg::Greeting;
 using RosLog = rcl_interfaces::msg::Log;
-using ProtoTopicMessage = bridge::v1::TopicMessage;
+using ProtoTopicMessage = bridge::TopicMessage;
 using FoxgloveLog = foxglove::Log;
 
 namespace {
 
+constexpr uint8_t LOG_LEVEL_DEBUG = 10;
+constexpr uint8_t LOG_LEVEL_INFO = 20;
+constexpr uint8_t LOG_LEVEL_WARN = 30;
+constexpr uint8_t LOG_LEVEL_ERROR = 40;
+constexpr uint8_t LOG_LEVEL_FATAL = 50;
+
 // ROS 2 log levels → foxglove.Log.Level
-foxglove::Log_Level ros_log_level_to_foxglove(uint8_t ros_level) {
+auto ros_log_level_to_foxglove(uint8_t ros_level) -> foxglove::Log_Level {
   // rcl_interfaces/msg/Log: DEBUG=10, INFO=20, WARN=30, ERROR=40, FATAL=50
   switch (ros_level) {
-    case 10:
+    case LOG_LEVEL_DEBUG:
       return foxglove::Log_Level_DEBUG;
-    case 20:
+    case LOG_LEVEL_INFO:
       return foxglove::Log_Level_INFO;
-    case 30:
+    case LOG_LEVEL_WARN:
       return foxglove::Log_Level_WARNING;
-    case 40:
+    case LOG_LEVEL_ERROR:
       return foxglove::Log_Level_ERROR;
-    case 50:
+    case LOG_LEVEL_FATAL:
       return foxglove::Log_Level_FATAL;
     default:
       return foxglove::Log_Level_UNKNOWN;
   }
 }
 
-std::string make_session_id() {
+auto make_session_id() -> std::string {
   auto now = std::chrono::system_clock::now();
-  auto epoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                      now.time_since_epoch())
-                      .count();
+  auto epoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
   return std::to_string(epoch_ms);
 }
 
-uint64_t wall_clock_ns() {
+auto wall_clock_ns() -> uint64_t {
   return static_cast<uint64_t>(
-      std::chrono::duration_cast<std::chrono::nanoseconds>(
-          std::chrono::system_clock::now().time_since_epoch())
-          .count());
+      std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 }
 
 // Build a FileDescriptorSet containing the given descriptor's file and all
 // transitive dependencies. This is required for MCAP protobuf schemas.
-void collect_file_dependencies(
-    const google::protobuf::FileDescriptor* file,
-    google::protobuf::FileDescriptorSet& fd_set,
-    std::unordered_set<std::string>& visited) {
-  if (!file || visited.count(std::string(file->name()))) return;
+void collect_file_dependencies(const google::protobuf::FileDescriptor* file, google::protobuf::FileDescriptorSet& fd_set,
+                               std::unordered_set<std::string>& visited) {
+  if (file == nullptr || visited.count(std::string(file->name())) > 0) {
+    return;
+  }
   visited.insert(std::string(file->name()));
   for (int i = 0; i < file->dependency_count(); ++i) {
     collect_file_dependencies(file->dependency(i), fd_set, visited);
@@ -85,11 +85,10 @@ void collect_file_dependencies(
 }
 
 template <typename ProtoMsg>
-std::string build_file_descriptor_set() {
+auto build_file_descriptor_set() -> std::string {
   google::protobuf::FileDescriptorSet fd_set;
   std::unordered_set<std::string> visited;
-  collect_file_dependencies(
-      ProtoMsg::descriptor()->file(), fd_set, visited);
+  collect_file_dependencies(ProtoMsg::descriptor()->file(), fd_set, visited);
   std::string out;
   fd_set.SerializeToString(&out);
   return out;
@@ -99,17 +98,10 @@ std::string build_file_descriptor_set() {
 
 class BridgeNode : public rclcpp::Node {
  public:
-  BridgeNode() : Node("bridge_node"), msg_seq_(0) {
+  BridgeNode() : Node("bridge_node") {
     session_id_ = make_session_id();
-    init_mcap();
-    init_zenoh();
-    init_subscriptions();
-
-    timer_ = create_wall_timer(
-        1s, std::bind(&BridgeNode::on_timer, this));
-
-    RCLCPP_INFO(get_logger(), "bridge started, session=%s mcap=%s",
-                session_id_.c_str(), mcap_path_.c_str());
+    setup_internals();
+    log_startup_info();
   }
 
   ~BridgeNode() override {
@@ -119,6 +111,17 @@ class BridgeNode : public rclcpp::Node {
   }
 
  private:
+  void setup_internals() {
+    init_mcap();
+    init_zenoh();
+    init_subscriptions();
+    timer_ = create_wall_timer(1s, [this]() -> void { on_timer(); });
+  }
+
+  void log_startup_info() {
+    RCLCPP_INFO(get_logger(), "bridge started, session=%s mcap=%s", session_id_.c_str(), mcap_path_.c_str());
+  }
+
   // ── Schema / Channel registration ──────────────────────────────
 
   struct ChannelInfo {
@@ -131,13 +134,12 @@ class BridgeNode : public rclcpp::Node {
   // Register a protobuf schema + MCAP channel pair.
   // Returns the index into channels_.
   template <typename ProtoMsg>
-  size_t register_channel(const std::string& mcap_topic) {
+  auto register_channel(const std::string& mcap_topic) -> size_t {
     std::string schema_name(ProtoMsg::descriptor()->full_name());
     std::string fds = build_file_descriptor_set<ProtoMsg>();
 
     // File writer schema + channel
-    mcap::Schema schema(schema_name, "protobuf",
-                        std::string_view(fds));
+    mcap::Schema schema(schema_name, "protobuf", std::string_view(fds));
     file_writer_.addSchema(schema);
 
     mcap::Channel channel(mcap_topic, "protobuf", schema.id);
@@ -151,42 +153,42 @@ class BridgeNode : public rclcpp::Node {
   // ── Subscription helper ────────────────────────────────────────
 
   template <typename RosMsg, typename ProtoMsg>
-  void add_topic(
-      const std::string& ros_topic, const std::string& mcap_topic,
-      const rclcpp::QoS& qos,
-      std::function<ProtoMsg(const typename RosMsg::SharedPtr&)> converter) {
+  void write_message_to_file(size_t ch_idx, const ProtoMsg& proto, const typename RosMsg::SharedPtr& /* ros_msg */) {
+    std::string serialized;
+    proto.SerializeToString(&serialized);
+    uint64_t timestamp_ns = wall_clock_ns();
+
+    mcap::Message mcap_msg;
+    mcap_msg.channelId = channels_[ch_idx].file_channel_id;
+    mcap_msg.sequence = msg_seq_++;
+    mcap_msg.logTime = timestamp_ns;
+    mcap_msg.publishTime = timestamp_ns;
+    mcap_msg.dataSize = serialized.size();
+    mcap_msg.data = reinterpret_cast<const std::byte*>(serialized.data());
+    auto status = file_writer_.write(mcap_msg);
+    if (!status.ok()) {
+      RCLCPP_WARN(get_logger(), "mcap file write error: %s", status.message.c_str());
+    }
+
+    buffer_for_network(ch_idx, std::move(serialized), timestamp_ns);
+  }
+
+  void buffer_for_network(size_t ch_idx, std::string serialized, uint64_t timestamp_ns) {
+    std::scoped_lock lock(buf_mutex_);
+    pending_.push_back({ch_idx, std::move(serialized), timestamp_ns});
+  }
+
+  template <typename RosMsg, typename ProtoMsg>
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+  void add_topic(const std::string& ros_topic, const std::string& mcap_topic, const rclcpp::QoS& qos,
+                 std::function<ProtoMsg(const typename RosMsg::SharedPtr&)> converter) {
     size_t ch_idx = register_channel<ProtoMsg>(mcap_topic);
 
     auto sub = create_subscription<RosMsg>(
-        ros_topic, qos,
-        [this, ch_idx, converter = std::move(converter)](
-            const typename RosMsg::SharedPtr msg) {
+        // NOLINTNEXTLINE(performance-unnecessary-value-param) -- ROS callback signature requires SharedPtr by value
+        ros_topic, qos, [this, ch_idx, converter = std::move(converter)](const typename RosMsg::SharedPtr msg) -> void {
           ProtoMsg proto = converter(msg);
-          std::string serialized;
-          proto.SerializeToString(&serialized);
-          uint64_t ts = wall_clock_ns();
-
-          // Write to file MCAP directly
-          mcap::Message mcap_msg;
-          mcap_msg.channelId = channels_[ch_idx].file_channel_id;
-          mcap_msg.sequence = msg_seq_++;
-          mcap_msg.logTime = ts;
-          mcap_msg.publishTime = ts;
-          mcap_msg.dataSize = serialized.size();
-          mcap_msg.data =
-              reinterpret_cast<const std::byte*>(serialized.data());
-          auto status = file_writer_.write(mcap_msg);
-          if (!status.ok()) {
-            RCLCPP_WARN(get_logger(), "mcap file write error: %s",
-                        status.message.c_str());
-          }
-
-          // Buffer for network mini-MCAP
-          {
-            std::lock_guard<std::mutex> lock(buf_mutex_);
-            pending_.push_back(
-                {ch_idx, std::move(serialized), ts});
-          }
+          write_message_to_file<RosMsg, ProtoMsg>(ch_idx, proto, msg);
         });
 
     subscriptions_.push_back(sub);
@@ -194,17 +196,19 @@ class BridgeNode : public rclcpp::Node {
 
   // ── Initialization ─────────────────────────────────────────────
 
+  static constexpr size_t CHUNK_SIZE_GIB = 1024ULL * 1024 * 1024;
+  static constexpr size_t TIMEOUT_MS = 1000;
+
   void init_mcap() {
     mcap_path_ = "demo_" + session_id_ + ".mcap";
 
     mcap::McapWriterOptions opts("protobuf");
     // Very large chunk size so chunks are flushed only by the timer
-    opts.chunkSize = 1024ULL * 1024 * 1024;  // 1 GiB
+    opts.chunkSize = CHUNK_SIZE_GIB;
     opts.compression = mcap::Compression::Zstd;
     auto status = file_writer_.open(mcap_path_, opts);
     if (!status.ok()) {
-      RCLCPP_ERROR(get_logger(), "failed to open mcap: %s",
-                   status.message.c_str());
+      RCLCPP_ERROR(get_logger(), "failed to open mcap: %s", status.message.c_str());
     }
   }
 
@@ -215,8 +219,7 @@ class BridgeNode : public rclcpp::Node {
     auto pub_opts = zenoh::Session::PublisherOptions::create_default();
     pub_opts.congestion_control = Z_CONGESTION_CONTROL_DROP;
 
-    zenoh_pub_.emplace(zenoh_session_->declare_publisher(
-        zenoh::KeyExpr("bridge/mcap"), std::move(pub_opts)));
+    zenoh_pub_.emplace(zenoh_session_->declare_publisher(zenoh::KeyExpr("bridge/mcap"), std::move(pub_opts)));
 
     RCLCPP_INFO(get_logger(), "zenoh publisher ready on bridge/mcap");
   }
@@ -227,13 +230,12 @@ class BridgeNode : public rclcpp::Node {
     data_qos.keep_all();
 
     // /rosout uses RELIABLE + TRANSIENT_LOCAL
-    rclcpp::QoS rosout_qos(1000);
+    rclcpp::QoS rosout_qos(TIMEOUT_MS);
     rosout_qos.reliable();
     rosout_qos.transient_local();
 
     // Greeting topics → TopicMessage
-    auto greeting_converter =
-        [this](const Greeting::SharedPtr& msg) -> ProtoTopicMessage {
+    auto greeting_converter = [this](const Greeting::SharedPtr& msg) -> ProtoTopicMessage {
       ProtoTopicMessage proto;
       proto.set_sender(msg->sender);
       proto.set_sequence(msg->sequence);
@@ -243,39 +245,33 @@ class BridgeNode : public rclcpp::Node {
       return proto;
     };
 
-    add_topic<Greeting, ProtoTopicMessage>(
-        "/cpp_to_py", "/cpp_to_py", data_qos,
-        [this, greeting_converter](
-            const Greeting::SharedPtr& msg) -> ProtoTopicMessage {
-          auto proto = greeting_converter(msg);
-          proto.set_topic("/cpp_to_py");
-          return proto;
-        });
+    add_topic<Greeting, ProtoTopicMessage>("/cpp_to_py", "/cpp_to_py", data_qos,
+                                           [greeting_converter](const Greeting::SharedPtr& msg) -> ProtoTopicMessage {
+                                             auto proto = greeting_converter(msg);
+                                             proto.set_topic("/cpp_to_py");
+                                             return proto;
+                                           });
 
-    add_topic<Greeting, ProtoTopicMessage>(
-        "/py_to_cpp", "/py_to_cpp", data_qos,
-        [this, greeting_converter](
-            const Greeting::SharedPtr& msg) -> ProtoTopicMessage {
-          auto proto = greeting_converter(msg);
-          proto.set_topic("/py_to_cpp");
-          return proto;
-        });
+    add_topic<Greeting, ProtoTopicMessage>("/py_to_cpp", "/py_to_cpp", data_qos,
+                                           [greeting_converter](const Greeting::SharedPtr& msg) -> ProtoTopicMessage {
+                                             auto proto = greeting_converter(msg);
+                                             proto.set_topic("/py_to_cpp");
+                                             return proto;
+                                           });
 
     // /rosout → foxglove.Log
-    add_topic<RosLog, FoxgloveLog>(
-        "/rosout", "/rosout", rosout_qos,
-        [](const RosLog::SharedPtr& msg) -> FoxgloveLog {
-          FoxgloveLog proto;
-          auto* ts = proto.mutable_timestamp();
-          ts->set_seconds(msg->stamp.sec);
-          ts->set_nanos(static_cast<int32_t>(msg->stamp.nanosec));
-          proto.set_level(ros_log_level_to_foxglove(msg->level));
-          proto.set_message(msg->msg);
-          proto.set_name(msg->name);
-          proto.set_file(msg->file);
-          proto.set_line(msg->line);
-          return proto;
-        });
+    add_topic<RosLog, FoxgloveLog>("/rosout", "/rosout", rosout_qos, [](const RosLog::SharedPtr& msg) -> FoxgloveLog {
+      FoxgloveLog proto;
+      auto* timestamp_ptr = proto.mutable_timestamp();
+      timestamp_ptr->set_seconds(msg->stamp.sec);
+      timestamp_ptr->set_nanos(static_cast<int32_t>(msg->stamp.nanosec));
+      proto.set_level(ros_log_level_to_foxglove(msg->level));
+      proto.set_message(msg->msg);
+      proto.set_name(msg->name);
+      proto.set_file(msg->file);
+      proto.set_line(msg->line);
+      return proto;
+    });
   }
 
   // ── Timer: flush file chunk + publish network mini-MCAP ────────
@@ -287,10 +283,12 @@ class BridgeNode : public rclcpp::Node {
     // Grab pending messages
     std::vector<PendingMessage> msgs;
     {
-      std::lock_guard<std::mutex> lock(buf_mutex_);
+      std::scoped_lock lock(buf_mutex_);
       msgs.swap(pending_);
     }
-    if (msgs.empty()) return;
+    if (msgs.empty()) {
+      return;
+    }
 
     // Build a self-contained mini-MCAP in memory
     std::ostringstream oss;
@@ -306,44 +304,43 @@ class BridgeNode : public rclcpp::Node {
     std::unordered_map<std::string, mcap::SchemaId> net_schema_ids;
 
     std::unordered_set<size_t> active_indices;
-    for (const auto& pm : msgs) {
-      active_indices.insert(pm.channel_idx);
+    for (const auto& pending_msg : msgs) {
+      active_indices.insert(pending_msg.channel_idx);
     }
 
     for (size_t i = 0; i < channels_.size(); ++i) {
-      if (active_indices.find(i) == active_indices.end()) continue;
-      const auto& ch = channels_[i];
+      if (active_indices.find(i) == active_indices.end()) {
+        continue;
+      }
+      const auto& channel = channels_[i];
       mcap::SchemaId sid;
-      auto it = net_schema_ids.find(ch.schema_name);
-      if (it != net_schema_ids.end()) {
-        sid = it->second;
+      auto schema_iter = net_schema_ids.find(channel.schema_name);
+      if (schema_iter != net_schema_ids.end()) {
+        sid = schema_iter->second;
       } else {
-        mcap::Schema schema(ch.schema_name, "protobuf",
-                            std::string_view(ch.fds_bytes));
+        mcap::Schema schema(channel.schema_name, "protobuf", std::string_view(channel.fds_bytes));
         net_writer.addSchema(schema);
         sid = schema.id;
-        net_schema_ids[ch.schema_name] = sid;
+        net_schema_ids[channel.schema_name] = sid;
       }
 
-      mcap::Channel channel(ch.mcap_topic, "protobuf", sid);
-      net_writer.addChannel(channel);
-      net_channel_ids[i] = channel.id;
+      mcap::Channel channel_obj(channel.mcap_topic, "protobuf", sid);
+      net_writer.addChannel(channel_obj);
+      net_channel_ids[i] = channel_obj.id;
     }
 
     // Write messages
-    for (const auto& pm : msgs) {
+    for (const auto& pending_msg : msgs) {
       mcap::Message mcap_msg;
-      mcap_msg.channelId = net_channel_ids[pm.channel_idx];
+      mcap_msg.channelId = net_channel_ids[pending_msg.channel_idx];
       mcap_msg.sequence = 0;
-      mcap_msg.logTime = pm.timestamp;
-      mcap_msg.publishTime = pm.timestamp;
-      mcap_msg.dataSize = pm.data.size();
-      mcap_msg.data =
-          reinterpret_cast<const std::byte*>(pm.data.data());
+      mcap_msg.logTime = pending_msg.timestamp;
+      mcap_msg.publishTime = pending_msg.timestamp;
+      mcap_msg.dataSize = pending_msg.data.size();
+      mcap_msg.data = reinterpret_cast<const std::byte*>(pending_msg.data.data());
       auto write_status = net_writer.write(mcap_msg);
       if (!write_status.ok()) {
-        RCLCPP_WARN(get_logger(), "mini-mcap write error: %s",
-                    write_status.message.c_str());
+        RCLCPP_WARN(get_logger(), "mini-mcap write error: %s", write_status.message.c_str());
       }
     }
 
@@ -351,8 +348,7 @@ class BridgeNode : public rclcpp::Node {
 
     // Publish via zenoh
     std::string bytes = oss.str();
-    RCLCPP_DEBUG(get_logger(), "published mini-mcap: %zu bytes, %zu msgs",
-                 bytes.size(), msgs.size());
+    RCLCPP_DEBUG(get_logger(), "published mini-mcap: %zu bytes, %zu msgs", bytes.size(), msgs.size());
     zenoh_pub_->put(zenoh::Bytes(std::move(bytes)));
   }
 
@@ -366,7 +362,7 @@ class BridgeNode : public rclcpp::Node {
 
   // Session
   std::string session_id_;
-  uint32_t msg_seq_;
+  uint32_t msg_seq_{0};
 
   // File MCAP
   std::string mcap_path_;
@@ -390,7 +386,7 @@ class BridgeNode : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
-int main(int argc, char* argv[]) {
+auto main(int argc, char* argv[]) -> int {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<BridgeNode>());
   rclcpp::shutdown();

@@ -6,6 +6,10 @@ modules:
 lint:
   use:
     - STANDARD
+  except:
+    - PACKAGE_VERSION_SUFFIX
+  ignore:
+    - proto/foxglove
 
 breaking:
   use:

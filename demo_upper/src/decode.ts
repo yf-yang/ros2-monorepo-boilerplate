@@ -23,7 +23,7 @@ type Decoder = (data: ArrayLike<number>) => TopicMessage | Log;
  * Schema-name to decoder registry.
  */
 const DECODERS: Record<string, Decoder> = {
-  "bridge.v1.TopicMessage": (data) => fromBinary(TopicMessageSchema, new Uint8Array(data)),
+  "bridge.TopicMessage": (data) => fromBinary(TopicMessageSchema, new Uint8Array(data)),
   "foxglove.Log": (data) => fromBinary(LogSchema, new Uint8Array(data)),
 };
 
@@ -58,20 +58,16 @@ export function printFoxgloveLog(msg: Log): void {
  * Decode and print a message dispatched by schema name.
  */
 export function decodeAndPrint(schemaName: string, data: ArrayLike<number>, topic: string): void {
-  const decoded = decodeMessage(schemaName, data);
-  if (!decoded) {
-    console.log(`  [unknown schema: ${schemaName}] ${(data as Uint8Array).length} bytes on ${topic}`);
-    return;
-  }
+  const bytes = new Uint8Array(data);
 
   switch (schemaName) {
-    case "bridge.v1.TopicMessage":
-      printTopicMessage(decoded as TopicMessage, topic);
+    case "bridge.TopicMessage":
+      printTopicMessage(fromBinary(TopicMessageSchema, bytes), topic);
       break;
     case "foxglove.Log":
-      printFoxgloveLog(decoded as Log);
+      printFoxgloveLog(fromBinary(LogSchema, bytes));
       break;
     default:
-      console.log(`  [${schemaName}] decoded on ${topic}`);
+      console.log(`  [unknown schema: ${schemaName}] ${data.length} bytes on ${topic}`);
   }
 }

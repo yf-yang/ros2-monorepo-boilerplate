@@ -14,7 +14,7 @@ find_package(protobuf CONFIG REQUIRED)
 find_package(zenohc REQUIRED)
 find_package(zenohcxx REQUIRED)
 
-set(PROTO_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../gen/cpp")
+set(PROTO_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../generated/proto")
 
 add_library(bridge_proto
   ${PROTO_GEN_DIR}/bridge/topic_message.pb.cc

@@ -7,4 +7,4 @@ namespace demo_cpp_node {
 
 std::string build_publish_message(std::size_t publish_count);
 
-} // namespace demo_cpp_node
+}  // namespace demo_cpp_node

@@ -61,7 +61,7 @@ pixi run demo:upper:replay -- --file demo_1234567890.mcap
 
 ```typescript
 const DECODERS: Record<string, Decoder> = {
-  "bridge.v1.TopicMessage": (data) => fromBinary(TopicMessageSchema, ...),
+  "bridge.TopicMessage": (data) => fromBinary(TopicMessageSchema, ...),
   "foxglove.Log": (data) => fromBinary(LogSchema, ...),
 };
 ```

@@ -63,7 +63,7 @@ export async function runReplay({ file }: ReplayOptions): Promise<void> {
     } catch (err) {
       console.error(
         `Failed to decode ${schema.name} on ${channel.topic} at logTime ${message.logTime}:`,
-        (err as Error).message,
+        err instanceof Error ? err.message : String(err),
       );
     }
   }

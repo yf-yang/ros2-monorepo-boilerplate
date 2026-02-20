@@ -4,8 +4,8 @@
 
 namespace demo_cpp_node {
 
-std::string build_publish_message(std::size_t publish_count) {
+auto build_publish_message(std::size_t publish_count) -> std::string {
   return "hello from cpp #" + std::to_string(publish_count);
 }
 
-} // namespace demo_cpp_node
+}  // namespace demo_cpp_node
