@@ -51,7 +51,8 @@
     "ghcr.io/wxw-matt/devcontainer-features/command_runner:latest": {
 			"command1": "npm i -g cspell",
       "command2": "su - vscode -c 'curl -fsSL https://claude.ai/install.sh | bash'",
-			"command3": "go install github.com/hashicorp/copywrite@latest"
+			"command3": "go install github.com/hashicorp/copywrite@latest",
+      "command4": "sudo apt install ripgrep" // For codex
     }
   },
   "overrideFeatureInstallOrder": [
