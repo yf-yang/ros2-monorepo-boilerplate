@@ -127,6 +127,10 @@
     ],
     "errorLens.delay": 3000,
     "cursorpyright.analysis.typeCheckingMode": "off",
+    "cursorpyright.analysis.diagnosticSeverityOverrides": {
+      "reportMissingImports": "none",
+      "reportMissingModuleSource": "none"
+    },
     "oxc.lint.run": "onSave",
     "[javascript]": {
       "editor.defaultFormatter": "oxc.oxc-vscode",
